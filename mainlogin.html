@@ -110,7 +110,7 @@ document.getElementById("loginForm").onsubmit = async (e) => {
     document.getElementById("error").textContent = "Invalid login";
   }
 };
-const SERVER_URL = '';
+const SERVER_URL = 'https://cgpa-backend-dcn1.onrender.com';
 
 async function logout() {
   await fetch(`${SERVER_URL}/auth/logout`, {
