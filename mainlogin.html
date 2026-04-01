@@ -102,6 +102,7 @@ document.getElementById("loginForm").onsubmit = async (e) => {
   const data = await res.json();
 
   if(data.success){
+     localStorage.setItem("user", JSON.stringify(data.user));
     if(data.user.role === "hod"){
       window.location.href = "hod.html";
     }else{

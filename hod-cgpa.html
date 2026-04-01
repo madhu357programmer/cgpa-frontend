@@ -59,7 +59,7 @@ td[class="cgpa"]{background:#e0f7fa;font-weight:700;color:#006064}
 </div>
 
 <script>
-
+const SERVER_URL = 'https://cgpa-backend-dcn1.onrender.com';
 // Load all batches into dropdown
 async function loadBatches() {
   try {
@@ -174,7 +174,7 @@ function renderTable(students, credits) {
   html += '</tbody></table>';
   document.getElementById('tableContainer').innerHTML = html;
 }
-const SERVER_URL = 'https://cgpa-backend-dcn1.onrender.com';
+
 
 async function logout() {
   await fetch(`${SERVER_URL}/auth/logout`, {

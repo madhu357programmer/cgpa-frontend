@@ -216,24 +216,17 @@ if(res.ok){
 }
 // Get HOD's department from session and lock dropdown
 async function loadHodDepartment() {
-  try {
-    const res = await fetch(`${SERVER_URL}/auth/check-session`, {
-      credentials: "include"
-    });
-    const data = await res.json();
-    
-    if (!data.loggedIn) {
-      window.location.href = "mainlogin.html";
-      return;
-    }
-
-    // Lock department dropdown to HOD's department only
-    const dept = data.user.department;
-    const deptSelect = document.getElementById('dept');
-    deptSelect.innerHTML = `<option value="${dept}">${dept}</option>`;
-    deptSelect.disabled = true;
-
-  } catch(e) {
+  try{
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user || user.role !== "hod") {
+    window.location.href = "mainlogin.html";
+    return;
+  }
+  // Lock department dropdown to HOD's department
+  const deptSelect = document.getElementById('dept');
+  deptSelect.innerHTML = `<option value="${user.department}">${user.department}</option>`;
+  deptSelect.disabled = true;
+} catch(e) {
     window.location.href = "mainlogin.html";
   }
 }
