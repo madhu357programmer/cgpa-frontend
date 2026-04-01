@@ -78,6 +78,7 @@ button{
 </div>
 
 <script>
+const SERVER_URL = 'https://cgpa-backend-dcn1.onrender.com';
 const roleSelect = document.getElementById("role");
 const deptSelect = document.getElementById("department");
 const usernameInput = document.getElementById("username");
@@ -86,7 +87,7 @@ const passwordInput = document.getElementById("password");
 document.getElementById("loginForm").onsubmit = async (e) => {
   e.preventDefault();
 
-  const res = await fetch("http://localhost:3000/auth/login", {
+  const res = await fetch(`${SERVER_URL}/auth/login`, {
     method: "POST",
     credentials: "include",
     headers: {"Content-Type":"application/json"},
@@ -110,7 +111,6 @@ document.getElementById("loginForm").onsubmit = async (e) => {
     document.getElementById("error").textContent = "Invalid login";
   }
 };
-const SERVER_URL = 'https://cgpa-backend-dcn1.onrender.com';
 
 async function logout() {
   await fetch(`${SERVER_URL}/auth/logout`, {
