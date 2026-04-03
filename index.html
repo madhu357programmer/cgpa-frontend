@@ -903,7 +903,7 @@ function closePopup() { document.getElementById('arrearPopup').style.display = '
 function addArrearRow() {
   const tr = document.createElement('tr');
   const td1 = document.createElement('td');
-  const inp = document.createElement('input'); inp.type='number'; inp.min=1; inp.max=4; inp.value=3;
+  const inp = document.createElement('input'); inp.type='number'; inp.min=1; inp.max=5; inp.value=3;
   td1.appendChild(inp); tr.appendChild(td1);
   const td2 = document.createElement('td');
   const sel = document.createElement('select');
@@ -919,7 +919,8 @@ function calculateArrearGPA() {
   let pts=0, cr=0;
   for (const r of document.querySelectorAll('#arrearTable tbody tr')) {
     const c = parseInt(r.querySelector('input').value);
-    if (c < 1 || c > 4) { alert('Credit must be between 1 and 4'); return; }
+    if (isNaN(c) || c < 1) { alert('Credit must be at least 1'); return; }
+    if (c > 5) { alert('Credit cannot be more than 5!'); return; }
     const g = GRADE_POINTS[r.querySelector('select').value];
     pts += c*g; cr += c;
   }
