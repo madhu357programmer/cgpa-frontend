@@ -126,7 +126,18 @@ body.dark td[id^="cgpa"]{background:#00363a;color:#80deea;}
   <button class="btn without" onclick="setMode('without')">Without Backlog</button>
   <button class="btn with" onclick="setMode('with')">With Backlog</button>
   <button class="btn gray" onclick="toggleDark()">🌙 Dark Mode</button>
-  <button class="btn gray" onclick="saveAsPDF()">📄 Save as PDF</button>
+  <select id="pdfSemSelect">
+  <option value="0">All Semesters</option>
+  <option value="1">Sem 1</option>
+  <option value="2">Sem 2</option>
+  <option value="3">Sem 3</option>
+  <option value="4">Sem 4</option>
+  <option value="5">Sem 5</option>
+  <option value="6">Sem 6</option>
+  <option value="7">Sem 7</option>
+  <option value="8">Sem 8</option>
+</select>
+<button class="btn gray" onclick="saveAsPDF()">📄 Save as PDF</button>
   <button class="btn gray" onclick="checkServerStatus()">🔌 Check Server</button>
   <button class="btn gray" onclick="clearAllData()">🗑️ Clear Data</button>
   <button class="btn gray" onclick="logout()">🚪 Logout</button>
@@ -505,22 +516,8 @@ function calcClassUpTo(student, upToSem) {
 // ============================================================
 async function saveAsPDF() {
   const { jsPDF } = window.jspdf;
-
-  const choice = confirm(
-    "Click OK to export ALL semesters\nClick Cancel to choose a specific semester"
-  );
-
-  let upToSem = SEM_COUNT;
-  if (!choice) {
-    const sem = prompt("Export up to which semester? (1-8):", "8");
-    if (!sem) return;
-    upToSem = parseInt(sem);
-    if (isNaN(upToSem) || upToSem < 1 || upToSem > 8) {
-      alert("Please enter a number between 1 and 8");
-      return;
-    }
-  }
-
+  const selected = parseInt(document.getElementById('pdfSemSelect').value);
+  const upToSem = selected === 0 ? SEM_COUNT : selected;
   const doc = new jsPDF('l', 'mm', 'a4');
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
