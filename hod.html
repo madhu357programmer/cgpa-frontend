@@ -179,6 +179,7 @@
 
 <script>
 const SERVER_URL = 'https://cgpa-backend-dcn1.onrender.com';
+
 async function createStaff(){
   const u = newUser.value.toLowerCase();
   const p = newPass.value;
@@ -196,8 +197,9 @@ async function createStaff(){
     return;
   }
 
-    const res = await fetch(`${SERVER_URL}/staff/create`,{
+  const res = await fetch(`${SERVER_URL}/staff/create`,{
     method:"POST",
+    credentials: "include",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
       username:u,
@@ -205,38 +207,46 @@ async function createStaff(){
       department:d
     })
   });
-const data = await res.json();
-if(res.ok){
-  msg.textContent = "Staff created successfully!";
-  msg.style.color = "green";
-}else{
-  msg.textContent = data.message || "Error creating staff";
-  msg.style.color = "red";
-}
-}
-// Get HOD's department from session and lock dropdown
-async function loadHodDepartment() {
-  try{
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user || user.role !== "hod") {
-    window.location.href = "mainlogin.html";
-    return;
+  const data = await res.json();
+  if(res.ok){
+    msg.textContent = "Staff created successfully!";
+    msg.style.color = "green";
+  }else{
+    msg.textContent = data.message || "Error creating staff";
+    msg.style.color = "red";
   }
-  // Lock department dropdown to HOD's department
-  const deptSelect = document.getElementById('dept');
-  deptSelect.innerHTML = `<option value="${user.department}">${user.department}</option>`;
-  deptSelect.disabled = true;
-} catch(e) {
+}
+
+async function loadHodDepartment() {
+  try {
+    const res = await fetch(`${SERVER_URL}/auth/check-session`, {
+      credentials: "include"
+    });
+    const data = await res.json();
+
+    if (!data.loggedIn || data.user.role !== "hod") {
+      window.location.href = "mainlogin.html";
+      return;
+    }
+
+    const dept = data.user.department;
+    const deptSelect = document.getElementById('dept');
+    deptSelect.innerHTML = `<option value="${dept}">${dept}</option>`;
+    deptSelect.disabled = true;
+
+  } catch(e) {
     window.location.href = "mainlogin.html";
   }
 }
 
 loadHodDepartment();
+
 async function logout() {
   await fetch(`${SERVER_URL}/auth/logout`, {
     method: "POST",
     credentials: "include"
   });
+  localStorage.removeItem("user");
   window.location.href = "mainlogin.html";
 }
 </script>
