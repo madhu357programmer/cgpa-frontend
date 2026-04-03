@@ -55,35 +55,33 @@ tr:hover{background:#f0f4ff}
 </div>
 
 <script>
+const SERVER_URL = 'https://cgpa-backend-dcn1.onrender.com';
+
 async function loadStaff() {
   try {
     const res = await fetch(`${SERVER_URL}/staff/view`, {
-  credentials: "include"
-});
+      credentials: "include"
+    });
     const data = await res.json();
-
     const tbody = document.getElementById("staffList");
-
     if(data.length === 0){
       tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No staff found</td></tr>';
       return;
     }
-
-   tbody.innerHTML = data.map((s, i) => `
-  <tr>
-    <td>${i + 1}</td>
-    <td>${s.username}</td>
-    <td>${s.department}</td>
-    <td><span class="badge ${s.role}">${s.role.toUpperCase()}</span></td>
-    <td>
-      <button onclick="deleteStaff('${s.username}')" 
-        style="background:#dc3545;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:600">
-        🗑️ Delete
-      </button>
-    </td>
-  </tr>
-`).join('');
-
+    tbody.innerHTML = data.map((s, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${s.username}</td>
+        <td>${s.department}</td>
+        <td><span class="badge ${s.role}">${s.role.toUpperCase()}</span></td>
+        <td>
+          <button onclick="deleteStaff('${s.username}')" 
+            style="background:#dc3545;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:600">
+            🗑️ Delete
+          </button>
+        </td>
+      </tr>
+    `).join('');
   } catch(e) {
     document.getElementById("staffList").innerHTML = 
       '<tr><td colspan="4" style="text-align:center;color:red">Could not load staff</td></tr>';
@@ -91,26 +89,26 @@ async function loadStaff() {
 }
 
 loadStaff();
-const SERVER_URL = 'https://cgpa-backend-dcn1.onrender.com';
 
 async function logout() {
-   await fetch(`${SERVER_URL}/auth/logout`, {
+  await fetch(`${SERVER_URL}/auth/logout`, {
     method: "POST",
     credentials: "include"
   });
   window.location.href = "mainlogin.html";
 }
+
 async function deleteStaff(username) {
   if (!confirm(`Are you sure you want to delete "${username}"?`)) return;
-  
   try {
-    const res = await fetch(`${SERVER_URL}/staff/view`, {
-      method: "DELETE"
+    const res = await fetch(`${SERVER_URL}/staff/delete/${username}`, {
+      method: "DELETE",
+      credentials: "include"
     });
     const data = await res.json();
     if (res.ok) {
       alert("Staff deleted successfully!");
-      loadStaff(); // Reload the table
+      loadStaff();
     } else {
       alert(data.message || "Error deleting staff");
     }
