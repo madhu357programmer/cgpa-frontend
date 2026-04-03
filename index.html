@@ -474,14 +474,38 @@ function clearAllData() {
     }
   }
 }
+// Calculate CGPA up to a specific semester
+function calcCgpaUpTo(student, upToSem) {
+  const gpas = student.gpas.slice(0, upToSem);
+  if (gpas.some(g => g === 0)) return '';
+  let pts = 0, cr = 0;
+  gpas.forEach((g, j) => {
+    if (g != null && SEM_CREDITS[j]) {
+      pts += Math.round(g * SEM_CREDITS[j] * 100) / 100;
+      cr += SEM_CREDITS[j];
+    }
+  });
+  if (!cr) return '';
+  const raw = pts / cr;
+  const three = Math.floor(raw * 1000) / 1000;
+  return (Math.round(three * 100) / 100).toFixed(2);
+}
 
+// Get class based on recalculated CGPA
+function calcClassUpTo(student, upToSem) {
+  const cgpa = calcCgpaUpTo(student, upToSem);
+  if (!cgpa) return '';
+  const c = parseFloat(cgpa);
+  if (c > 8.5 && !student.arrear) return 'First Class with Distinction';
+  if (c > 6.5) return 'First Class';
+  return 'Second Class';
+}
 // ============================================================
 // PDF EXPORT
 // ============================================================
 async function saveAsPDF() {
   const { jsPDF } = window.jspdf;
 
-  // Ask user what to export
   const choice = confirm(
     "Click OK to export ALL semesters\nClick Cancel to choose a specific semester"
   );
@@ -507,23 +531,25 @@ async function saveAsPDF() {
   doc.setFont('helvetica', 'normal');
   doc.text(document.getElementById('batchYear').textContent, 148, 30, { align: 'center' });
 
-  // Build headers up to selected semester
   const semHeaders = Array.from({length: upToSem}, (_, i) => `Sem${i+1}`);
   const headers = [['S.No','Reg No','Name','Sec', ...semHeaders, 'CGPA','Class','Arrear']];
 
-  // Build rows up to selected semester
-  const rows = students.map(st => [
-    st.s_no,
-    st.reg_no,
-    st.name,
-    st.section,
-    ...st.gpas.slice(0, upToSem).map(g => g ?? ''),
-    st.cgpa || '',
-    st.class || '',
-    st.arrear ? 'Yes' : 'No'
-  ]);
+  const rows = students.map(st => {
+    const cgpa = upToSem === SEM_COUNT ? (st.cgpa || '') : calcCgpaUpTo(st, upToSem);
+    const cls = upToSem === SEM_COUNT ? (st.class || '') : calcClassUpTo(st, upToSem);
+    return [
+      st.s_no,
+      st.reg_no,
+      st.name,
+      st.section,
+      ...st.gpas.slice(0, upToSem).map(g => g ?? ''),
+      cgpa,
+      cls,
+      st.arrear ? 'Yes' : 'No'
+    ];
+  });
 
-  const cgpaColIndex = 4 + upToSem; // dynamic CGPA column index
+  const cgpaColIndex = 4 + upToSem;
 
   doc.autoTable({
     head: headers,
@@ -789,7 +815,6 @@ document.getElementById('printBtn').onclick = () => {
     });
   }
 };
-
 document.getElementById('printSemBtn').onclick = () => {
   const upToSem = parseInt(document.getElementById('semSelect').value);
   
@@ -825,14 +850,16 @@ document.getElementById('printSemBtn').onclick = () => {
   `;
 
   students.forEach(st => {
+    const cgpa = upToSem === SEM_COUNT ? (st.cgpa || '') : calcCgpaUpTo(st, upToSem);
+    const cls = upToSem === SEM_COUNT ? (st.class || '') : calcClassUpTo(st, upToSem);
     html += `<tr>
       <td>${st.s_no}</td>
       <td>${st.reg_no}</td>
       <td class="name">${st.name}</td>
       <td>${st.section}</td>
       ${Array.from({length: upToSem}, (_, i) => `<td>${st.gpas[i] ?? ''}</td>`).join('')}
-      <td class="cgpa">${st.cgpa || ''}</td>
-      <td>${st.class || ''}</td>
+      <td class="cgpa">${cgpa}</td>
+      <td>${cls}</td>
       <td>${st.arrear ? 'Yes' : 'No'}</td>
     </tr>`;
   });
