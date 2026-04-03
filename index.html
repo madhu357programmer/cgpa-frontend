@@ -903,20 +903,20 @@ function closePopup() { document.getElementById('arrearPopup').style.display = '
 function addArrearRow() {
   const tr = document.createElement('tr');
   const td1 = document.createElement('td');
-  const inp = document.createElement('input'); 
-inp.type='number'; 
-inp.min=1; 
-inp.max=4; 
-inp.value=3;
-inp.oninput = function() {
-  if (this.value > 4) {
-    this.value = 4;
-    alert('Credit cannot be more than 4!');
-  }
-  if (this.value < 1) {
-    this.value = 1;
-  }
-};type='number'; inp.min=1; inp.max=4; inp.value=3;
+  const inp = document.createElement('input');
+  inp.type = 'number';
+  inp.min = 1;
+  inp.max = 5;
+  inp.value = 3;
+  inp.oninput = function() {
+    if (parseInt(this.value) > 5) {
+      this.value = 5;
+      alert('Credit cannot be more than 5!');
+    }
+    if (parseInt(this.value) < 1) {
+      this.value = 1;
+    }
+  };
   td1.appendChild(inp); tr.appendChild(td1);
   const td2 = document.createElement('td');
   const sel = document.createElement('select');
