@@ -57,7 +57,7 @@ tr:hover{background:#f0f4ff}
 <script>
 async function loadStaff() {
   try {
-    const res = await fetch("http://localhost:3000/staff/view", {
+    const res = await fetch(`${SERVER_URL}/staff/view`, {
   credentials: "include"
 });
     const data = await res.json();
@@ -104,7 +104,7 @@ async function deleteStaff(username) {
   if (!confirm(`Are you sure you want to delete "${username}"?`)) return;
   
   try {
-    const res = await fetch(`http://localhost:3000/staff/delete/${username}`, {
+    const res = await fetch(`${SERVER_URL}/staff/view`, {
       method: "DELETE"
     });
     const data = await res.json();
