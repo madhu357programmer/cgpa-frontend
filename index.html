@@ -480,22 +480,50 @@ function clearAllData() {
 // ============================================================
 async function saveAsPDF() {
   const { jsPDF } = window.jspdf;
+
+  // Ask user what to export
+  const choice = confirm(
+    "Click OK to export ALL semesters\nClick Cancel to choose a specific semester"
+  );
+
+  let upToSem = SEM_COUNT;
+  if (!choice) {
+    const sem = prompt("Export up to which semester? (1-8):", "8");
+    if (!sem) return;
+    upToSem = parseInt(sem);
+    if (isNaN(upToSem) || upToSem < 1 || upToSem > 8) {
+      alert("Please enter a number between 1 and 8");
+      return;
+    }
+  }
+
   const doc = new jsPDF('l', 'mm', 'a4');
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
   doc.text("Velammal Engineering College", 148, 15, { align: 'center' });
   doc.setFontSize(13);
- doc.text(document.getElementById('deptHeader').textContent, 148, 23, { align: 'center' });
+  doc.text(document.getElementById('deptHeader').textContent, 148, 23, { align: 'center' });
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
   doc.text(document.getElementById('batchYear').textContent, 148, 30, { align: 'center' });
 
-  const headers = [['S.No','Reg No','Name','Sec','Sem1','Sem2','Sem3','Sem4','Sem5','Sem6','Sem7','Sem8','CGPA','Class','Arrear']];
+  // Build headers up to selected semester
+  const semHeaders = Array.from({length: upToSem}, (_, i) => `Sem${i+1}`);
+  const headers = [['S.No','Reg No','Name','Sec', ...semHeaders, 'CGPA','Class','Arrear']];
+
+  // Build rows up to selected semester
   const rows = students.map(st => [
-    st.s_no, st.reg_no, st.name, st.section,
-    ...st.gpas.map(g => g ?? ''),
-    st.cgpa || '', st.class || '', st.arrear ? 'Yes' : 'No'
+    st.s_no,
+    st.reg_no,
+    st.name,
+    st.section,
+    ...st.gpas.slice(0, upToSem).map(g => g ?? ''),
+    st.cgpa || '',
+    st.class || '',
+    st.arrear ? 'Yes' : 'No'
   ]);
+
+  const cgpaColIndex = 4 + upToSem; // dynamic CGPA column index
 
   doc.autoTable({
     head: headers,
@@ -506,7 +534,7 @@ async function saveAsPDF() {
     columnStyles: { 2: { halign: 'left', cellWidth: 35 } },
     alternateRowStyles: { fillColor: [240,244,255] },
     didParseCell: function(data) {
-      if (data.column.index === 12) {
+      if (data.column.index === cgpaColIndex) {
         data.cell.styles.fillColor = [224,247,250];
         data.cell.styles.textColor = [0,96,100];
         data.cell.styles.fontStyle = 'bold';
@@ -519,10 +547,14 @@ async function saveAsPDF() {
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text(`Page ${i} of ${pageCount} | Generated on ${new Date().toLocaleDateString()}`,
-      148, doc.internal.pageSize.height - 5, { align: 'center' });
+    doc.text(
+      `Page ${i} of ${pageCount} | Generated on ${new Date().toLocaleDateString()}`,
+      148, doc.internal.pageSize.height - 5, { align: 'center' }
+    );
   }
-  doc.save(`CGPA_Report_${getBatch()}.pdf`);
+
+  const semLabel = upToSem === SEM_COUNT ? 'All' : `Sem1-${upToSem}`;
+  doc.save(`CGPA_Report_${getBatch()}_${semLabel}.pdf`);
 }
 
 // ============================================================
