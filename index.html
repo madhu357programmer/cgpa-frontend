@@ -378,30 +378,6 @@ window.onload = async function() {
     if (students.length > 0) save();
   }, 30000);
 };
-  // Try to restore the last batch the staff was working on
-  const lastBatch = localStorage.getItem(LAST_BATCH_KEY);
-  if (lastBatch) {
-    setBatch(lastBatch);
-    showStatus(`Restoring your last session: ${lastBatch}…`, 'info', 0);
-
-    const loaded = await loadBatchFromServer(lastBatch)
-                || loadBatchFromLocal(lastBatch);
-
-    if (loaded) {
-      renderTable();
-      showStatus(`✅ Previous data loaded for batch: ${lastBatch}`, 'success');
-    } else {
-      showStatus(`No previous data found for ${lastBatch}. Please upload a CSV file.`, 'warning');
-    }
-  } else {
-    showStatus('👆 Please choose a CSV file to get started.', 'info', 0);
-  }
-
-  // Auto-save every 30 seconds
-  setInterval(() => {
-    if (students.length > 0) save();
-  }, 30000);
-};
 
 // ============================================================
 // CSV FILE UPLOAD — extract batch from filename, load existing data first
