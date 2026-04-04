@@ -350,6 +350,16 @@ function loadBatchFromLocal(batch) {
 // ============================================================
 // PAGE LOAD — restore last worked batch automatically
 // ============================================================
+window.onload = async function() {
+  const isAuth = await checkAuth();
+  if (!isAuth) return;
+  try {
+  const res = await fetch(`${SERVER_URL}/auth/check-session`, { credentials: "include" });
+  const data = await res.json();
+  if (data.loggedIn && data.user.department) {
+    document.getElementById('deptHeader').textContent = `Department of ${data.user.department}`;
+  }
+} catch(e) {}
   // Try to restore the last batch the staff was working on
   const lastBatch = localStorage.getItem(LAST_BATCH_KEY);
   if (lastBatch) {
