@@ -54,7 +54,7 @@ body.dark .btn{background:linear-gradient(135deg,#333,#111);}
 body.dark td[id^="cgpa"]{background:#00363a;color:#80deea;}
 .page{animation:fadeIn .4s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
-
+.btn.red{background:linear-gradient(135deg,#f97676,#a33d3d);}
 /* Status banner */
 #statusBanner{
   display:none;
@@ -137,10 +137,9 @@ body.dark td[id^="cgpa"]{background:#00363a;color:#80deea;}
   <option value="7">Sem 7</option>
   <option value="8">Sem 8</option>
 </select>
-<button class="btn gray" onclick="saveAsPDF()">📄 Save as PDF</button>
-  <button class="btn gray" onclick="checkServerStatus()">🔌 Check Server</button>
-  <button class="btn gray" onclick="clearAllData()">🗑️ Clear Data</button>
-  <button class="btn gray" onclick="logout()">🚪 Logout</button>
+<button class="btn" onclick="saveAsPDF()">📄 Save as PDF</button>
+<button class="btn" onclick="clearAllData()">🗑️ Clear Data</button>
+<button class="btn red" onclick="logout()">🚪 Logout</button>
 </div>
 
 <div class="no-print" id="mainControls">
@@ -229,9 +228,23 @@ async function checkAuth() {
     if (!data.loggedIn) { window.location.href = "mainlogin.html"; return false; }
     
     // Update department header
-    if (data.user.department) {
-      document.getElementById('deptHeader').textContent = `Department of ${data.user.department}`;
-    }
+   if (data.user.department) {
+  const deptNames = {
+    'IT': 'Information Technology',
+    'CSE': 'Computer Science and Engineering',
+    'ECE': 'Electronics and Communication Engineering',
+    'EEE': 'Electrical and Electronics Engineering',
+    'MECH': 'Mechanical Engineering',
+    'CIVIL': 'Civil Engineering',
+    'CSECS': 'Computer Science and Engineering (Cyber Security)',
+    'AIDS': 'Artificial Intelligence and Data Science',
+    'MBA': 'Master of Business Administration',
+    'AUTOMOBILES': 'Automobile Engineering',
+    'E&I': 'Electronics and Instrumentation Engineering'
+  };
+  const fullName = deptNames[data.user.department] || data.user.department;
+  document.getElementById('deptHeader').textContent = `Department of ${fullName}`;
+} 
     
     return true;
   } catch (e) {
@@ -334,24 +347,6 @@ function loadBatchFromLocal(batch) {
     return students.length > 0;
   } catch(e) { return false; }
 }
-
-// ============================================================
-// SERVER STATUS CHECK
-// ============================================================
-async function checkServerStatus() {
-  try {
-    const res = await fetch(`${SERVER_URL}/batch/test`);
-    if (res.ok) {
-      const data = await res.json();
-      alert(`✅ Server is running!\n${data.message}\nTimestamp: ${data.timestamp}`);
-    } else {
-      alert(`❌ Server returned error: ${res.status}`);
-    }
-  } catch(e) {
-    alert(`❌ Cannot connect to server at ${SERVER_URL}\nMake sure backend is running!`);
-  }
-}
-
 // ============================================================
 // PAGE LOAD — restore last worked batch automatically
 // ============================================================
@@ -906,12 +901,12 @@ function addArrearRow() {
   const inp = document.createElement('input');
   inp.type = 'number';
   inp.min = 1;
-  inp.max = 5;
+  inp.max = 4;
   inp.value = 3;
   inp.oninput = function() {
-    if (parseInt(this.value) > 5) {
-      this.value = 5;
-      alert('Credit cannot be more than 5!');
+    if (parseInt(this.value) > 4) {
+      this.value = 4;
+      alert('Credit cannot be more than 4!');
     }
     if (parseInt(this.value) < 1) {
       this.value = 1;
